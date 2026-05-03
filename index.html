@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lyte Food — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand: #E85D24;
+  --brand-light: #FFF0E8;
+  --brand-dark: #B84010;
+  --dark: #1A1208;
+  --surface: #FAFAF8;
+  --card: #FFFFFF;
+  --border: rgba(0,0,0,0.08);
+  --text: #1A1208;
+  --muted: #7A6D5E;
+  --green: #1D9E75;
+  --green-light: #E1F5EE;
+  --amber: #BA7517;
+  --amber-light: #FAEEDA;
+  --red: #C0392B;
+  --red-light: #FDECEA;
+  --blue: #185FA5;
+  --blue-light: #E6F1FB;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--surface);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  min-height: 100vh;
+  background: var(--dark);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+
+.logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.logo-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.logo-icon {
+  width: 36px; height: 36px;
+  background: var(--brand);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+
+.logo-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
+.logo-tagline {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.5px;
+  padding-left: 2px;
+}
+
+.sms-number {
+  margin: 16px 24px;
+  background: rgba(232,93,36,0.15);
+  border: 1px solid rgba(232,93,36,0.25);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.sms-number-label { font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+.sms-number-val { font-size: 14px; font-weight: 500; color: var(--brand); font-family: 'Syne', sans-serif; }
+
+nav { flex: 1; padding: 8px 12px; }
+
+.nav-section { font-size: 10px; color: rgba(255,255,255,0.25); letter-spacing: 1px; text-transform: uppercase; padding: 12px 12px 6px; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-weight: 400;
+  transition: all 0.15s;
+  margin-bottom: 2px;
+  position: relative;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); }
+.nav-item.active { background: rgba(232,93,36,0.15); color: white; font-weight: 500; }
+.nav-item.active::before { content:''; position:absolute; left:0; top:25%; bottom:25%; width:3px; background:var(--brand); border-radius:0 2px 2px 0; }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+.nav-badge { margin-left: auto; background: var(--brand); color: white; font-size: 10px; padding: 2px 7px; border-radius: 20px; font-weight: 600; }
+
+.sidebar-footer {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.online-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; margin-right: 6px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.online-text { font-size: 11px; color: rgba(255,255,255,0.35); }
+
+/* Main */
+.main {
+  margin-left: 240px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.topbar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.page-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+.time-badge {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.content { flex: 1; padding: 28px 32px; }
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  opacity: 0.06;
+  transform: translate(20px,-20px);
+}
+.stat-card.brand::after { background: var(--brand); }
+.stat-card.green::after { background: var(--green); }
+.stat-card.amber::after { background: var(--amber); }
+.stat-card.blue::after { background: var(--blue); }
+
+.stat-emoji { font-size: 24px; margin-bottom: 12px; }
+.stat-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.stat-val { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700; }
+.stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.stat-card.brand .stat-val { color: var(--brand); }
+.stat-card.green .stat-val { color: var(--green); }
+.stat-card.amber .stat-val { color: var(--amber); }
+.stat-card.blue .stat-val { color: var(--blue); }
+
+/* Grid layout */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.grid-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+/* Panel */
+.panel-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.panel-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
+.panel-body { padding: 0; }
+
+/* SMS Feed */
+.sms-item {
+  display: flex;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.sms-item:last-child { border-bottom: none; }
+.sms-item:hover { background: var(--surface); }
+
+.sms-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+  flex-shrink: 0;
+}
+.av-res { background: var(--green-light); color: var(--green); }
+.av-cmd { background: var(--blue-light); color: var(--blue); }
+.av-abs { background: var(--amber-light); color: var(--amber); }
+.av-ann { background: var(--red-light); color: var(--red); }
+.av-unk { background: #F1EFE8; color: #5F5E5A; }
+
+.sms-body { flex: 1; min-width: 0; }
+.sms-top { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+.sms-phone { font-size: 13px; font-weight: 500; }
+.sms-time { font-size: 11px; color: var(--muted); margin-left: auto; }
+.sms-msg { font-size: 12px; color: var(--muted); margin-bottom: 5px; line-height: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sms-reply { font-size: 11px; color: var(--green); background: var(--green-light); padding: 4px 8px; border-radius: 6px; display: inline-block; line-height: 1.5; max-width: 100%; }
+
+.pill { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 500; white-space: nowrap; }
+.pill-res { background: var(--green-light); color: var(--green); }
+.pill-cmd { background: var(--blue-light); color: var(--blue); }
+.pill-abs { background: var(--amber-light); color: var(--amber); }
+.pill-ann { background: var(--red-light); color: var(--red); }
+
+/* Tables grid */
+.tables-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 16px 20px;
+}
+.table-cell {
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 2px solid transparent;
+}
+.table-cell:hover { transform: scale(1.04); }
+.t-libre { background: var(--green-light); border-color: rgba(29,158,117,0.2); }
+.t-occupee { background: var(--red-light); border-color: rgba(192,57,43,0.2); }
+.t-reservee { background: var(--amber-light); border-color: rgba(186,117,23,0.2); }
+.table-num { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+.t-libre .table-num { color: var(--green); }
+.t-occupee .table-num { color: var(--red); }
+.t-reservee .table-num { color: var(--amber); }
+.table-cap { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.table-status { font-size: 10px; font-weight: 500; margin-top: 4px; }
+.t-libre .table-status { color: var(--green); }
+.t-occupee .table-status { color: var(--red); }
+.t-reservee .table-status { color: var(--amber); }
+
+/* Commandes */
+.cmd-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.cmd-item:last-child { border-bottom: none; }
+.cmd-ref { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted); width: 80px; }
+.cmd-detail { flex: 1; font-size: 12px; }
+.cmd-price { font-size: 13px; font-weight: 500; color: var(--text); margin-right: 8px; }
+.cmd-status { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 500; cursor: pointer; }
+.cs-encours { background: var(--amber-light); color: var(--amber); }
+.cs-prete { background: var(--green-light); color: var(--green); }
+.cs-livree { background: var(--blue-light); color: var(--blue); }
+
+/* Panel pages */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Simulateur */
+.sim-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.sim-box h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+.sim-examples { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.sim-ex-btn {
+  font-size: 11px; padding: 5px 10px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--surface);
+  cursor: pointer; color: var(--muted);
+  transition: all 0.15s;
+}
+.sim-ex-btn:hover { background: var(--brand-light); border-color: var(--brand); color: var(--brand); }
+.sim-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.sim-input { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); }
+.sim-input:focus { outline: none; border-color: var(--brand); }
+.sim-phone { width: 140px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); }
+.sim-btn { padding: 10px 20px; background: var(--brand); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+.sim-btn:hover { background: var(--brand-dark); }
+.sim-result { background: var(--surface); border-radius: 10px; padding: 14px; display: none; }
+.sim-result.show { display: block; }
+.sim-in { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.sim-in strong { color: var(--text); }
+.sim-out { font-size: 13px; color: var(--green); font-weight: 500; white-space: pre-line; line-height: 1.6; }
+
+/* Réservations list */
+.res-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.res-item:last-child { border-bottom: none; }
+.res-num { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; width: 40px; text-align: center; }
+.res-body { flex: 1; }
+.res-ref { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+.res-detail { font-size: 11px; color: var(--muted); }
+.res-time { font-size: 12px; color: var(--blue); font-weight: 500; text-align: right; }
+
+/* Refresh btn */
+.refresh-btn { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: white; cursor: pointer; color: var(--muted); }
+.refresh-btn:hover { background: var(--surface); }
+
+/* Badge status dot */
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+.dot-green { background: var(--green); }
+.dot-amber { background: var(--amber); }
+.dot-red { background: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-icon">🍽️</div>
+      <span class="logo-name">Lyte Food</span>
+    </div>
+    <div class="logo-tagline">Gestion SMS automatique</div>
+  </div>
+
+  <div class="sms-number">
+    <div class="sms-number-label">Numéro SMS</div>
+    <div class="sms-number-val">+229 XX XXX XXX</div>
+  </div>
+
+  <nav>
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)">
+      <span class="nav-icon">◼</span> Tableau de bord
+    </div>
+    <div class="nav-item" onclick="showPage('sms',this)">
+      <span class="nav-icon">💬</span> SMS en direct
+      <span class="nav-badge" id="sms-badge">0</span>
+    </div>
+
+    <div class="nav-section">Restaurant</div>
+    <div class="nav-item" onclick="showPage('reservations',this)">
+      <span class="nav-icon">📅</span> Réservations
+    </div>
+    <div class="nav-item" onclick="showPage('commandes',this)">
+      <span class="nav-icon">🧾</span> Commandes
+    </div>
+    <div class="nav-item" onclick="showPage('tables',this)">
+      <span class="nav-icon">🪑</span> Tables
+    </div>
+
+    <div class="nav-section">Outils</div>
+    <div class="nav-item" onclick="showPage('simulateur',this)">
+      <span class="nav-icon">🧪</span> Simuler SMS
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <span class="online-dot"></span>
+    <span class="online-text">Système actif — SMS reçus</span>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <h1 class="page-title" id="page-title">Tableau de bord</h1>
+    <div class="topbar-right">
+      <div class="time-badge" id="clock">--:--</div>
+      <button class="refresh-btn" onclick="loadAll()">↻ Actualiser</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card brand">
+          <div class="stat-emoji">📅</div>
+          <div class="stat-label">Réservations aujourd'hui</div>
+          <div class="stat-val" id="stat-res">—</div>
+          <div class="stat-sub">confirmées par SMS</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-emoji">🪑</div>
+          <div class="stat-label">Tables libres</div>
+          <div class="stat-val" id="stat-tables">—</div>
+          <div class="stat-sub">disponibles maintenant</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-emoji">🧾</div>
+          <div class="stat-label">Commandes du jour</div>
+          <div class="stat-val" id="stat-cmd">—</div>
+          <div class="stat-sub">à emporter / livraison</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-emoji">💬</div>
+          <div class="stat-label">SMS reçus</div>
+          <div class="stat-val" id="stat-sms">—</div>
+          <div class="stat-sub">traités automatiquement</div>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <!-- Derniers SMS -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <span class="panel-title">Derniers SMS reçus</span>
+            <span style="font-size:11px;color:var(--muted)">Mise à jour auto</span>
+          </div>
+          <div class="panel-body" id="sms-feed">
+            <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Chargement...</div>
+          </div>
+        </div>
+
+        <!-- Tables rapides -->
+        <div class="panel-card">
+          <div class="panel-header">
+            <span class="panel-title">Tables</span>
+          </div>
+          <div class="tables-grid" id="tables-mini"></div>
+          <div style="padding:10px 20px;border-top:1px solid var(--border);display:flex;gap:16px">
+            <span style="font-size:11px;color:var(--green)"><span class="status-dot dot-green"></span>Libre</span>
+            <span style="font-size:11px;color:var(--amber)"><span class="status-dot dot-amber"></span>Réservée</span>
+            <span style="font-size:11px;color:var(--red)"><span class="status-dot dot-red"></span>Occupée</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Commandes du jour -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <span class="panel-title">Commandes du jour</span>
+        </div>
+        <div class="panel-body" id="commandes-mini">
+          <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Chargement...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SMS EN DIRECT -->
+    <div class="page" id="page-sms">
+      <div class="panel-card">
+        <div class="panel-header">
+          <span class="panel-title">Tous les SMS reçus</span>
+          <button class="refresh-btn" onclick="loadSMS()">↻</button>
+        </div>
+        <div id="sms-full">
+          <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Chargement...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RÉSERVATIONS -->
+    <div class="page" id="page-reservations">
+      <div class="panel-card">
+        <div class="panel-header">
+          <span class="panel-title">Réservations</span>
+          <button class="refresh-btn" onclick="loadReservations()">↻</button>
+        </div>
+        <div id="reservations-list">
+          <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Chargement...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMMANDES -->
+    <div class="page" id="page-commandes">
+      <div class="panel-card">
+        <div class="panel-header">
+          <span class="panel-title">Commandes</span>
+          <button class="refresh-btn" onclick="loadCommandes()">↻</button>
+        </div>
+        <div id="commandes-list">
+          <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Chargement...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLES -->
+    <div class="page" id="page-tables">
+      <div class="panel-card">
+        <div class="panel-header">
+          <span class="panel-title">Gestion des tables</span>
+          <button class="refresh-btn" onclick="loadTables()">↻</button>
+        </div>
+        <div style="padding:20px">
+          <div class="tables-grid" id="tables-full" style="grid-template-columns:repeat(4,1fr)"></div>
+        </div>
+        <div style="padding:12px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)">
+          Cliquez sur une table pour changer son statut
+        </div>
+      </div>
+    </div>
+
+    <!-- SIMULATEUR -->
+    <div class="page" id="page-simulateur">
+      <div class="sim-box">
+        <h3>🧪 Simulateur SMS — Test sans vrai téléphone</h3>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Exemples rapides :</div>
+        <div class="sim-examples">
+          <button class="sim-ex-btn" onclick="fillSim('Table pour 4 personnes ce soir à 20h')">📅 Réservation 4 pers.</button>
+          <button class="sim-ex-btn" onclick="fillSim('1 poulet yassa + 2 jus de bissap à emporter')">🧾 Commande yassa</button>
+          <button class="sim-ex-btn" onclick="fillSim('Annuler ma réservation')">❌ Annulation</button>
+          <button class="sim-ex-btn" onclick="fillSim('Je serai absent demain matin')">👥 Absence</button>
+          <button class="sim-ex-btn" onclick="fillSim('C est quoi votre menu du jour ?')">📋 Menu</button>
+          <button class="sim-ex-btn" onclick="fillSim('2 attiéké poisson + 1 bissap')">🐟 Commande attiéké</button>
+          <button class="sim-ex-btn" onclick="fillSim('Table pour 2 personnes demain à 19h30 anniversaire')">🎂 Anniversaire</button>
+        </div>
+        <div class="sim-row">
+          <input class="sim-phone" id="sim-phone" value="+22961000001" placeholder="Numéro client">
+          <input class="sim-input" id="sim-msg" placeholder="Tape le message SMS du client...">
+          <button class="sim-btn" onclick="simulerSMS()">Envoyer ↗</button>
+        </div>
+        <div class="sim-result" id="sim-result">
+          <div class="sim-in" id="sim-in-text"></div>
+          <div class="sim-out" id="sim-out-text"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const API = '';
+
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+  const titles = { dashboard:'Tableau de bord', sms:'SMS en direct', reservations:'Réservations', commandes:'Commandes', tables:'Tables', simulateur:'Simuler un SMS' };
+  document.getElementById('page-title').textContent = titles[id];
+  if (id==='sms') loadSMS();
+  if (id==='reservations') loadReservations();
+  if (id==='commandes') loadCommandes();
+  if (id==='tables') loadTables();
+}
+
+function clock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+}
+setInterval(clock, 1000); clock();
+
+async function fetchJSON(url) {
+  try {
+    const r = await fetch(url);
+    return await r.json();
+  } catch(e) {
+    return null;
+  }
+}
+
+async function loadStats() {
+  const d = await fetchJSON(API+'/api/stats');
+  if (!d) return;
+  document.getElementById('stat-res').textContent = d.reservations;
+  document.getElementById('stat-tables').textContent = d.tablesLibres + '/8';
+  document.getElementById('stat-cmd').textContent = d.commandes;
+  document.getElementById('stat-sms').textContent = d.smsAujourdhui;
+  document.getElementById('sms-badge').textContent = d.smsAujourdhui;
+}
+
+function typeClass(t) {
+  if (t==='reservation') return ['av-res','pill-res','RES'];
+  if (t==='commande') return ['av-cmd','pill-cmd','CMD'];
+  if (t==='absence') return ['av-abs','pill-abs','ABS'];
+  if (t==='annulation') return ['av-ann','pill-ann','ANN'];
+  return ['av-unk','','?'];
+}
+function typeLabel(t) {
+  if (t==='reservation') return 'Réservation';
+  if (t==='commande') return 'Commande';
+  if (t==='absence') return 'Absence';
+  if (t==='annulation') return 'Annulation';
+  return 'Message';
+}
+function timeAgo(ts) {
+  const diff = Math.floor((Date.now() - new Date(ts)) / 60000);
+  if (diff < 1) return 'à l\'instant';
+  if (diff < 60) return `il y a ${diff} min`;
+  return `il y a ${Math.floor(diff/60)}h`;
+}
+
+async function loadSMSFeed() {
+  const data = await fetchJSON(API+'/api/sms');
+  if (!data) return;
+  const incoming = data.filter(s => s.direction === 'entrant').slice(0, 6);
+  renderSMSItems(incoming, 'sms-feed');
+}
+
+async function loadSMS() {
+  const data = await fetchJSON(API+'/api/sms');
+  if (!data) { document.getElementById('sms-full').innerHTML='<div style="padding:24px;text-align:center;color:var(--muted)">Aucun SMS</div>'; return; }
+  const incoming = data.filter(s => s.direction==='entrant');
+  renderSMSItems(incoming, 'sms-full');
+}
+
+function renderSMSItems(items, containerId) {
+  const el = document.getElementById(containerId);
+  if (!items.length) { el.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Aucun SMS pour l\'instant</div>'; return; }
+  el.innerHTML = items.map(s => {
+    const [avClass, pillClass, abbr] = typeClass(s.type_detecte);
+    return `<div class="sms-item">
+      <div class="sms-avatar ${avClass}">${abbr}</div>
+      <div class="sms-body">
+        <div class="sms-top">
+          <span class="sms-phone">${s.phone}</span>
+          ${pillClass ? `<span class="pill ${pillClass}">${typeLabel(s.type_detecte)}</span>` : ''}
+          <span class="sms-time">${timeAgo(s.created_at)}</span>
+        </div>
+        <div class="sms-msg">${s.message}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadTables() {
+  const data = await fetchJSON(API+'/api/tables');
+  if (!data) return;
+  const render = (containerId, clickable) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = data.map(t => {
+      const cls = t.statut==='libre'?'t-libre':t.statut==='occupee'?'t-occupee':'t-reservee';
+      const label = t.statut==='libre'?'Libre':t.statut==='occupee'?'Occupée':'Réservée';
+      const click = clickable ? `onclick="toggleTable('${t.id}','${t.statut}')"` : '';
+      return `<div class="table-cell ${cls}" ${click}>
+        <div class="table-num">${t.numero}</div>
+        <div class="table-cap">${t.capacite} pers.</div>
+        <div class="table-status">${label}</div>
+      </div>`;
+    }).join('');
+  };
+  render('tables-mini', false);
+  render('tables-full', true);
+}
+
+async function toggleTable(id, current) {
+  const order = ['libre','reservee','occupee'];
+  const next = order[(order.indexOf(current)+1)%3];
+  await fetch(API+`/api/tables/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({statut:next}) });
+  loadTables();
+}
+
+async function loadCommandes() {
+  const data = await fetchJSON(API+'/api/commandes');
+  renderCommandes(data, 'commandes-list');
+  renderCommandes(data && data.slice(0,4), 'commandes-mini');
+}
+
+function renderCommandes(data, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!data || !data.length) { el.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Aucune commande</div>'; return; }
+  el.innerHTML = data.map(c => {
+    const cs = c.statut==='en_cours'?'cs-encours':c.statut==='prete'?'cs-prete':'cs-livree';
+    const label = c.statut==='en_cours'?'En cours':c.statut==='prete'?'Prête':'Livrée';
+    const next = c.statut==='en_cours'?'prete':c.statut==='prete'?'livree':'livree';
+    return `<div class="cmd-item">
+      <span class="cmd-ref">${c.reference}</span>
+      <span class="cmd-detail">${c.details}</span>
+      <span class="cmd-price">${parseInt(c.montant_total).toLocaleString()} F</span>
+      <span class="cmd-status ${cs}" onclick="updateCommande('${c.id}','${next}')">${label} →</span>
+    </div>`;
+  }).join('');
+}
+
+async function updateCommande(id, statut) {
+  await fetch(API+`/api/commandes/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({statut}) });
+  loadCommandes();
+}
+
+async function loadReservations() {
+  const data = await fetchJSON(API+'/api/reservations');
+  const el = document.getElementById('reservations-list');
+  if (!data || !data.length) { el.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Aucune réservation</div>'; return; }
+  el.innerHTML = data.map(r => {
+    const dt = new Date(r.date_reservation);
+    const heure = dt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const date = dt.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+    return `<div class="res-item">
+      <div class="res-num" style="color:var(--brand)">T${r.table_numero}</div>
+      <div class="res-body">
+        <div class="res-ref">${r.reference} · ${r.nombre_personnes} pers. · ${r.phone}</div>
+        <div class="res-detail">${r.notes||'Réservation standard'} · Paiement: ${r.paiement_statut}</div>
+      </div>
+      <div class="res-time">${date}<br>${heure}</div>
+    </div>`;
+  }).join('');
+}
+
+function fillSim(msg) {
+  document.getElementById('sim-msg').value = msg;
+}
+
+async function simulerSMS() {
+  const phone = document.getElementById('sim-phone').value;
+  const message = document.getElementById('sim-msg').value.trim();
+  if (!message) return;
+
+  const btn = document.querySelector('.sim-btn');
+  btn.textContent = '⏳...';
+  btn.disabled = true;
+
+  try {
+    const r = await fetch(API+'/api/simuler-sms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, message })
+    });
+    const d = await r.json();
+    document.getElementById('sim-in-text').innerHTML = `<strong>📱 ${phone}:</strong> "${message}"`;
+    document.getElementById('sim-out-text').textContent = '🤖 Lyte Food: ' + (d.reponse || d.error || 'Erreur');
+    document.getElementById('sim-result').classList.add('show');
+    document.getElementById('sim-msg').value = '';
+    setTimeout(loadAll, 1000);
+  } catch(e) {
+    // Simulation locale si le serveur n'est pas disponible
+    const reponse = simulerLocal(message);
+    document.getElementById('sim-in-text').innerHTML = `<strong>📱 ${phone}:</strong> "${message}"`;
+    document.getElementById('sim-out-text').textContent = '🤖 Lyte Food (simulation): ' + reponse;
+    document.getElementById('sim-result').classList.add('show');
+    document.getElementById('sim-msg').value = '';
+  }
+
+  btn.textContent = 'Envoyer ↗';
+  btn.disabled = false;
+}
+
+function simulerLocal(msg) {
+  const m = msg.toLowerCase();
+  if (/réserv|reserv|table pour/.test(m)) return '✅ Réservation confirmée! Table n°5 disponible. Réf: RES-042. Acompte opt.: pay.lytefood.bj/RES-042 — Lyte Food 🍽️';
+  if (/annul/.test(m)) return '❌ Réservation annulée. La table est libérée. À bientôt chez Lyte Food!';
+  if (/absent|absence|congé/.test(m)) return '📋 Absence notée. Le gérant a été informé. Merci — Lyte Food';
+  if (/menu|carte|plat/.test(m)) return '🍽️ Menu Lyte Food:\n— Thiéboudienne: 2 500F\n— Poulet yassa: 2 000F\n— Attiéké poisson: 1 800F\n🥤 Bissap: 500F';
+  if (/yassa|attiéké|thiéb|alloco|bissap/.test(m)) return '✅ Commande CMD-041 enregistrée! Prête dans ~25 min. Payer: pay.lytefood.bj/CMD-041 (MTN/Moov) — Lyte Food 🍽️';
+  return '👋 Bienvenue chez Lyte Food! Envoyez "MENU" ou passez votre commande. Réservations: "TABLE pour X à [heure]"';
+}
+
+async function loadAll() {
+  await Promise.all([loadStats(), loadSMSFeed(), loadTables(), loadCommandes()]);
+}
+
+// Auto-refresh toutes les 30 sec
+loadAll();
+setInterval(loadAll, 30000);
+
+document.getElementById('sim-msg').addEventListener('keydown', e => {
+  if (e.key === 'Enter') simulerSMS();
+});
+</script>
+</body>
+</html>
